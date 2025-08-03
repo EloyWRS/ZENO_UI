@@ -124,7 +124,9 @@ class AuthService {
   // Get current user info
   Future<User?> getCurrentUser() async {
     try {
+      print('🔍 getCurrentUser() called');
       final token = await getToken();
+      print('🔑 Token: ${token != null ? "exists" : "null"}');
       if (token == null) return null;
 
       final response = await http.get(
@@ -135,12 +137,18 @@ class AuthService {
         },
       );
 
+      print('📡 Response status: ${response.statusCode}');
+      print('📡 Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print('✅ Successfully parsed user data');
         return User.fromJson(data);
       }
+      print('❌ Failed to get user data');
       return null;
     } catch (e) {
+      print('💥 Error in getCurrentUser: $e');
       return null;
     }
   }

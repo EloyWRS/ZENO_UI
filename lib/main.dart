@@ -42,7 +42,26 @@ class _AuthWrapperState extends State<AuthWrapper> {
   }
 
   Future<void> _checkAuthStatus() async {
+    print('🔐 Checking authentication status...');
     final isLoggedIn = await _authService.isLoggedIn();
+    print('🔐 Is logged in: $isLoggedIn');
+    
+    if (isLoggedIn) {
+      final user = await _authService.getCurrentUser();
+      print('👤 Current user: ${user?.name} (${user?.id})');
+      
+      // If we have a token but can't get user data, the token is invalid
+      if (user == null) {
+        print('⚠️ Token exists but user data is null - clearing invalid token');
+        await _authService.logout();
+        setState(() {
+          _isLoggedIn = false;
+          _isLoading = false;
+        });
+        return;
+      }
+    }
+    
     setState(() {
       _isLoggedIn = isLoggedIn;
       _isLoading = false;
